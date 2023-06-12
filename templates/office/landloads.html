@@ -1,0 +1,124 @@
+{% extends 'snippets/base.html' %}
+
+{% block content %}
+{% load static %}
+
+	<div class="wrapper">
+		{% include "snippets/sidebar.html" %}
+
+			<main class="content">
+				<div class="container-fluid p-0">
+
+					
+<br>
+<div class="d-flex justify-content-between">
+	<h5 class="card-title mb-0">Landload List</h5>
+	
+	<div class="page-btn">
+	
+
+								</div>
+</div>
+{% if messages %}
+						{% include "snippets/messages.html" %}
+					{% endif %}
+
+<br>
+
+					<div class="row">
+						<div class="col-12 col-lg-12 col-xxl-9 d-flex">
+							<div class="card flex-fill">
+								<div class="card-header">
+
+								</div>
+								<table class="table table-hover my-0">
+									<thead>
+										<tr>
+											<th>NO</th>
+											<th class="d-none d-xl-table-cell">Name</th>
+											<th class="d-none d-xl-table-cell">Phone Number</th>
+											<th>Email</th>
+											<th class="d-none d-md-table-cell">Location</th>
+											<th>Action</th>
+										</tr>
+									</thead>
+									<tbody>
+									
+									{% for no, landload in  landloads_list %}
+										
+										
+										<tr>
+											<td>{{no}}</td>
+											<td class="d-none d-xl-table-cell">{{landload.name}}</td>
+											<td class="d-none d-xl-table-cell">{{landload.price}}</td>
+											<td class="d-none d-md-table-cell">{{landload.email}}</td>,
+											<td>{{landload.location}}</td>
+
+											<td>
+												<button class="btn btn-primary">
+													<a class="text-white" href="">Edit</a>
+
+												</button>
+												<button class="btn btn-danger">
+													<a class="text-white" href="">Delete</a>
+
+												</button>
+											</td>
+
+										</tr>
+								
+										{% endfor %}
+
+									</tbody>
+								</table>
+							</div>
+						</div>
+						
+					</div>
+
+				</div>
+			</main>
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="exampleModalLabel">Add New Landload</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<form action="" method="post" enctype="multipart/form-data">
+		<div class="modal-body">
+				{% csrf_token %}
+
+				
+				{% for field in form %}
+				<div class="form-group">
+					{{field.label}}
+					{{field}}
+				</div>
+					
+				{% endfor %}
+					
+				<div class="d-flex justify-content-center">
+					<button  type="submit" class="btn btn-primary">Save</button>
+				  </div>
+		</div>
+	</form>
+
+
+		
+		<br>
+	  </div>
+  </div>
+
+
+
+
+
+	{% endblock %}
+
+	
