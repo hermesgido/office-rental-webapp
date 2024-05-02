@@ -4,33 +4,32 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from office.form import *
-from .models import *
 
-def upload_isu(request):
-    action = "issuu.document.upload"
-    apiKey = "hukprh6d967ap9w8mu41lgi79kk8fr36"
-    name = "racing"
-    title = "Race Cars"
+# # def upload_isu(request):
+# #     action = "issuu.document.upload"
+# #     apiKey = "hukprh6d967ap9w8mu41lgi79kk8fr36"
+# #     name = "racing"
+# #     title = "Race Cars"
     
-    import hashlib
-    sig = f"actionissuu.document.uploadapiKey{apiKey}nameracingtitleRace Cars"
+# #     import hashlib
+# #     sig = f"actionissuu.document.uploadapiKey{apiKey}nameracingtitleRace Cars"
 
-    # Create an instance of the MD5 hash object
-    md5_hash = hashlib.md5()
+# #     # Create an instance of the MD5 hash object
+# #     md5_hash = hashlib.md5()
 
-    # Update the hash object with the string
-    md5_hash.update(sig.encode())
+# #     # Update the hash object with the string
+# #     md5_hash.update(sig.encode())
 
-    # Get the hexadecimal representation of the hash
-    md5_hash_hex = md5_hash.hexdigest()
+# #     # Get the hexadecimal representation of the hash
+# #     md5_hash_hex = md5_hash.hexdigest()
 
-    print(md5_hash_hex)
+# #     print(md5_hash_hex)
 
     
-    context = {
-        'sig': md5_hash_hex,
-    }
-    return render(request, 'upload.html', context)
+# #     context = {
+# #         'sig': md5_hash_hex,
+# #     }
+# #     return render(request, 'upload.html', context)
 
 def signin(request):
     if request.method == 'POST':
@@ -131,6 +130,7 @@ def edit_booking(request, id):
     
     context = {'form': form}
     return render(request, 'office/edit_booking.html', context)
+
 @login_required
 def tenants(request):
     form = TenantForm()

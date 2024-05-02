@@ -6,9 +6,8 @@ from django.conf.urls.static import static
 
 app_name = 'office'
 urlpatterns = [
-    
     path('signin/', views.signin, name='signin'),
-    path('signup/', views.signup, name='signup'),
+    path('', views.signup, name='signup'),
     path('dashboard/', views.dashboard   ,  name="dashboard"),
     path('bookings/', views.bookings   ,  name="bookings"),
     path('tenants/', views.tenants   ,  name="tenants"),
@@ -19,7 +18,7 @@ urlpatterns = [
     path('profile/', views.profile , name="profile"),
     
     path('logout/', views.logout_user , name="logout"),
-    path('upload_isu/', views.upload_isu, name="upload_isu"),
+    # path('upload_isu/', views.upload_isu, name="upload_isu"),
     path('edit_booking/<str:id>/', views.edit_booking, name="edit_booking"),
 
 
