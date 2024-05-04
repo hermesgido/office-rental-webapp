@@ -8,15 +8,12 @@ from .serializers import LandLoadSerializer, TenantSerializer, OfficeSerializer,
 from django.contrib.auth.models import User
 
 from django.template.loader import get_template
-from xhtml2pdf import pisa
+# from xhtml2pdf import pisa
 from django.conf import settings
 from io import BytesIO
 
 from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
-
-
 
 class CreateUserView(APIView):
     def post(self, request):
@@ -189,11 +186,6 @@ class InvoiceAPIView(APIView):
 
 
 
-from django.http import HttpResponse
-from django.template.loader import get_template
-from io import BytesIO
-from xhtml2pdf import pisa
-from rest_framework.views import APIView
 
 def render_to_pdf(template_src, context_dict={}):
     template = get_template(template_src)

@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import (
 
 
 urlpatterns = [
-    #api url for creating a user
+    # api url for creating a user
     path('users/create/', CreateUserView.as_view(), name='create_user'),
     path('users/update/', CreateUserView.as_view(), name='update_user'),
 
