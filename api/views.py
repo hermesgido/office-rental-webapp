@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -103,6 +104,76 @@ class OfficeAPIView(APIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+def send_sms_api(  message, 
+             recipients, 
+              ):
+    content_type="application/json"
+    schedule_time=None
+    recipient_id=None
+    dest_addr=None
+    encoding=0
+    source_addr
+    api_key = ""
+    secret_key = ""
+    
+    url = "https://apisms.beem.africa/v1/send"
+    headers = {
+        "Content-Type": content_type
+    }
+    auth = (api_key, secret_key)
+    data = {
+        "source_addr": source_addr,
+        "message": message,
+        "recipients": recipients,
+        "encoding": encoding
+    }
+    if recipient_id:
+        data["recipient_id"] = recipient_id
+    if dest_addr:
+        data["dest_addr"] = dest_addr
+    if schedule_time:
+        data["schedule_time"] = schedule_time
+
+    response = requests.post(url, headers=headers, auth=auth, json=data)
+    
+    return response.json()
+
+# Example usage:
+api_key = "your_api_key"
+secret_key = "your_secret_key"
+source_addr = "your_source_address"
+message = "Hello from Beem Africa!"
+recipients = ["255784825785"]  # Example destination number
+response = send_sms_api(message, recipients)
+print(response)
+
+
+def send_sms():
+    import requests
+    from requests.auth import HTTPBasicAuth
+    url = "https://apisms.beem.africa/v1/send"
+
+    data = {
+        "source_addr": "INFO",
+        "encoding": 0,
+        "message": "SMS Test from Python API",
+        "recipients": [
+            {
+                "recipient_id": 1,
+                "dest_addr": "255655060606"
+            }
+        ]
+    }
+    username = "<api_key>"
+    password = "<secret-key>"
+    response = requests.post(url, json=data, auth=HTTPBasicAuth(username, password))
+
+    if response.status_code == 200:
+        print("SMS sent successfully!")
+    else:
+        print("SMS sending failed. Status code:", response.status_code)
+        print("Response:", response.text)
+        
 class BookingAPIView(APIView):
     ##authentication_classes = [JWTAuthentication]
 
@@ -121,6 +192,7 @@ class BookingAPIView(APIView):
                 book.save()
                 office.is_available = False
                 office.save()
+                
                 response = {
                     "office_id": office_id,
                     "success": True,

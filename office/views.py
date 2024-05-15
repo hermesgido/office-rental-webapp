@@ -5,6 +5,19 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from office.form import *
 
+
+from django.http import HttpResponse
+import requests
+from django.contrib.auth.models import User
+from django.template.loader import get_template
+# from xhtml2pdf import pisa
+from django.conf import settings
+from io import BytesIO
+from rest_framework import status
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+
+
 # # def upload_isu(request):
 # #     action = "issuu.document.upload"
 # #     apiKey = "hukprh6d967ap9w8mu41lgi79kk8fr36"
@@ -165,7 +178,79 @@ def customers(request):
 
 @login_required
 def invoices(request):
-    return render(request, 'office/invoices.html')
+    bookings = OfficeBooking.objects.all()
+
+    
+    context = {'booking_list': bookings}
+    return render(request, 'office/invoices.html', context)
+
+
+
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from django.http import HttpResponse
+from io import BytesIO
+
+@login_required
+def download_invoice(request, id):
+    if id:
+        try:
+            booking = OfficeBooking.objects.get(id=id)
+            context = {
+                'booking_id': booking.id,
+                'office_name': booking.office.name,
+                'tenant_name': booking.tenant.name,
+                'total_cost': booking.office.price,
+                'status': booking.status,
+            }
+
+            # Create a BytesIO buffer to store the PDF content
+            buffer = BytesIO()
+
+            # Create a ReportLab PDF document
+            doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+            # Define invoice data
+            invoice_data = [
+                ["Invoice", ""],
+                ["Booking ID:", context['booking_id']],
+                ["Office Name:", context['office_name']],
+                ["Tenant Name:", context['tenant_name']],
+              
+                ["Total Cost:", f"TSh {context['total_cost']}"],
+                ["Status:", context['status']],
+            ]
+
+            # Create a table and style
+            table = Table(invoice_data)
+            style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.gray),
+                                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                                ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+            table.setStyle(style)
+
+            # Add the table to the PDF document
+            doc.build([table])
+
+            # Get the PDF content from the buffer
+            pdf_bytes = buffer.getvalue()
+            buffer.close()
+
+            # Create an HTTP response with PDF content
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="invoice.pdf"'
+            response.write(pdf_bytes)
+            return response
+
+        except OfficeBooking.DoesNotExist:
+            return HttpResponse("Invalid booking_id", status=400)
+
+    return HttpResponse("No ID provided", status=400)
 
 @login_required
 def offices(request):
