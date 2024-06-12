@@ -35,7 +35,12 @@ class OfficeForm(MainForm):
     class Meta:
         model = Office
         exclude = ['landload']
-    
+
+    def __init__(self, *args, **kwargs):
+        super(OfficeForm, self).__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].required = False
+
 
 class OfficeBookingForm(MainForm):
     class Meta:

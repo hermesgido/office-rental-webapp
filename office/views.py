@@ -291,3 +291,39 @@ def profile(request):
 
     context = {'form': form}
     return render(request, 'office/profile.html', context)
+
+
+def delete_office(request, id):
+    office = Office.objects.get(id=id)
+    office.delete()
+    messages.success(request, 'Office deleted successful')
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+# def edit_office(request, id):
+#     messages.success(request, 'Office deleted successful')
+#     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def edit_office(request):
+    office = Office.objects.get(id=request.POST.get('idd'))
+    if request.method == 'POST':
+        form = OfficeForm(request.POST, instance=office)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Office deleted successful')
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+   
+def delete_landload(request, id):
+    landload= LandLoad.objects.get(id=id)
+    landload.delete()
+    messages.success(request, 'Landload deleted successful')
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+  
+def delete_tenant(request, id):
+    tenant= Tenant.objects.get(id=id)
+    tenant.delete()
+    messages.success(request, 'Tenant deleted successful')
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+

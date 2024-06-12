@@ -1,7 +1,7 @@
-{% extends 'snippets/base.html' %} 
-{% block content %} 
+{% extends 'snippets/base.html' %}
+{% block content %}
 {% load static %}
- {% load   humanize %}
+{% load humanize %}
 
 <div class="wrapper">
   {% include "snippets/sidebar.html" %}
@@ -18,13 +18,17 @@
             type="button"
             class="btn btn-end btn-primary"
             data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
+            data-bs-target="#addOfficeModal"
           >
             Add Office
           </button>
         </div>
         {% endif %}
       </div>
+
+      {% if messages %}
+      {% include "snippets/messages.html" %}
+      {% endif %}
 
       <br />
       <div class="row">
@@ -46,32 +50,34 @@
               <tbody>
                 {% for no, office in offices_list %}
                 <tr>
-                  <td>{{no}}</td>
-                  <td class="d-none d-xl-table-cell">{{office.name}}</td>
-                  <td class="d-none d-xl-table-cell">
-                    {{office.price | intcomma}}
-                  </td>
-
-                  <td class="d-none d-xl-table-cell">
-                    {{office.landload.name}}
-                  </td>
-                  <td class="d-none d-md-table-cell">{{office.location}}</td>
-                  , {% if office.is_available %}
+                  <td>{{ no }}</td>
+                  <td class="d-none d-xl-table-cell">{{ office.name }}</td>
+                  <td class="d-none d-xl-table-cell">{{ office.price | intcomma }}</td>
+                  <td class="d-none d-xl-table-cell">{{ office.landload.name }}</td>
+                  <td class="d-none d-md-table-cell">{{ office.location }}</td>
+                  {% if office.is_available %}
                   <td><span class="badge bg-success">Available</span></td>
                   {% else %}
                   <td><span class="badge bg-danger">Not Available</span></td>
-
                   {% endif %}
                   <td>
-                    <button class="btn btn-primary">
-                      <a class="text-white" href="">Edit</a>
+                    <button class="btn btn-primary" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#editOfficeModal"
+                      data-id="{{ office.id }}"
+                      data-name="{{ office.name }}"
+                      data-description="{{ office.description }}"
+                      data-price="{{ office.price }}"
+                      data-landload="{{ office.landload.name }}"
+                      data-location="{{ office.location }}"
+                      data-available="{{ office.is_available }}">
+                      Edit
                     </button>
                     <button class="btn btn-danger">
-                      <a class="text-white" href="">Delete</a>
+                      <a class="text-white" href="{% url 'office:delete_office' office.id %}">Delete</a>
                     </button>
                   </td>
                 </tr>
-
                 {% endfor %}
               </tbody>
             </table>
@@ -81,19 +87,19 @@
     </div>
   </main>
 
-  <!-- Modal -->
+  <!-- Add Office Modal -->
   <div
     class="modal fade"
-    id="exampleModal"
+    id="addOfficeModal"
     tabindex="-1"
     role="dialog"
-    aria-labelledby="exampleModalLabel"
+    aria-labelledby="addOfficeModalLabel"
     aria-hidden="true"
   >
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Add New Office</h5>
+          <h5 class="modal-title" id="addOfficeModalLabel">Add New Office</h5>
           <button
             type="button"
             class="close"
@@ -105,21 +111,83 @@
         </div>
         <form action="" method="post" enctype="multipart/form-data">
           <div class="modal-body">
-            {% csrf_token %} {% for field in form %}
-            <div class="form-group">{{field.label}} {{field}}</div>
-
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">{{ field.label }} {{ field }}</div>
             {% endfor %}
-
             <div class="d-flex justify-content-center">
               <button type="submit" class="btn btn-primary">Save</button>
             </div>
           </div>
         </form>
-
         <br />
       </div>
     </div>
-
-    {% endblock %}
   </div>
+
+  <!-- Edit Office Modal -->
+  <div
+    class="modal fade"
+    id="editOfficeModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="editOfficeModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editOfficeModalLabel">Edit Office</h5>
+          <button
+            type="button"
+            class="close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="editOfficeForm" action=" {% url 'office:edit_office' %}" method="post" enctype="multipart/form-data">
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="text"  hidden name="idd" id="idd">
+            {% for field in form %}
+            <div class="form-group">
+              {{ field.label_tag }} {{ field }}
+            </div>
+            {% endfor %}
+            <div class="d-flex justify-content-center">
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </div>
+        </form>
+        <br />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const editOfficeModal = document.getElementById('editOfficeModal');
+      editOfficeModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; // Button that triggered the modal
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        const description = button.getAttribute('data-description'); 
+        const price = button.getAttribute('data-price');
+        const location = button.getAttribute('data-location');
+        const isAvailable = button.getAttribute('data-available') === 'true';
+
+        const form = document.getElementById('editOfficeForm');
+        form.querySelector('[name="idd"]').value = id;
+        form.querySelector('[name="name"]').value = name;
+        form.querySelector('[name="description"]').value = description;
+        form.querySelector('[name="price"]').value = price;
+        form.querySelector('[name="location"]').value = location;
+        form.querySelector('[name="is_available"]').checked = isAvailable;
+      });
+    });
+  </script>
 </div>
+
+{% endblock %}

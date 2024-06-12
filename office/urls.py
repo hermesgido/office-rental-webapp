@@ -22,6 +22,13 @@ urlpatterns = [
     # path('upload_isu/', views.upload_isu, name="upload_isu"),
     path('edit_booking/<str:id>/', views.edit_booking, name="edit_booking"),
 
+    path('delete_office/<str:id>/', views.delete_office, name="delete_office"),
+    path('edit_office/', views.edit_office, name="edit_office"),
+
+    path('delete_landload/<str:id>/', views.delete_landload, name="delete_landload"),
+    path('delete_tenant/<str:id>/', views.delete_tenant, name="delete_tenant"),
+
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -211,10 +211,10 @@ class BookingAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        # token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
-        # print(token)
+        token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
+        print(token)
         office_id = data.get('office_id')
-        # user = request.user
+        user = request.user
 
         user = Tenant.objects.first().user
         print(user)
