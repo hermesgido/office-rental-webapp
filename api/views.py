@@ -1,3 +1,4 @@
+from base64 import b64encode
 from django.http import HttpResponse
 import requests
 from rest_framework.views import APIView
@@ -15,6 +16,37 @@ from io import BytesIO
 
 from rest_framework import status
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
+
+def send_sms(number, message):
+    import requests
+    from requests.auth import HTTPBasicAuth
+    url = "https://apisms.beem.africa/v1/send"
+
+    data = {
+        "source_addr": "INFO",
+        "encoding": 0,
+        "message": message,
+        "recipients": [
+            {
+                "recipient_id": 1,
+                "dest_addr": f"{number}"
+            }
+        ]
+    }
+    password = "MGVjMjVhOTQ1N2U0MmM2MzQwNjc2YzI3MjdiMzk2YzViZjVhNDcyZGRkODViMDc3MGFlYTkzYzQ1YTAyMjAwZg=="
+    username = "ce64e6750d9de50e"
+
+    response = requests.post(url, json=data, auth=HTTPBasicAuth(username, password))
+
+    if response.status_code == 200:
+        print("SMS sent successfully!")
+    else:
+        print("SMS sending failed. Status code:", response.status_code)
+        print("Response:", response.text)
+
+
+
 
 class CreateUserView(APIView):
     def post(self, request):
@@ -112,9 +144,9 @@ def send_sms_api(  message,
     recipient_id=None
     dest_addr=None
     encoding=0
-    source_addr
     api_key = ""
-    secret_key = ""
+    secret_key = "=="
+    source_addr = "INFO"
     
     url = "https://apisms.beem.africa/v1/send"
     headers = {
@@ -138,17 +170,17 @@ def send_sms_api(  message,
     
     return response.json()
 
+    
+
 # Example usage:
-api_key = "your_api_key"
-secret_key = "your_secret_key"
-source_addr = "your_source_address"
-message = "Hello from Beem Africa!"
-recipients = ["255784825785"]  # Example destination number
-response = send_sms_api(message, recipients)
-print(response)
+
+# message = "Hello from Beem Africa!"
+# recipients = ["255621189850"]  # Example destination number
+# response = send_sms_api(message, recipients)
+# print(response)
 
 
-def send_sms():
+def send_sms2():
     import requests
     from requests.auth import HTTPBasicAuth
     url = "https://apisms.beem.africa/v1/send"
@@ -179,10 +211,12 @@ class BookingAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
-        print(token)
+        # token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
+        # print(token)
         office_id = data.get('office_id')
-        user = request.user
+        # user = request.user
+
+        user = Tenant.objects.first().user
         print(user)
         if office_id and user:
             office = Office.objects.get(id=office_id)
@@ -198,6 +232,13 @@ class BookingAPIView(APIView):
                     "success": True,
                     "message": "Your office booking is successful"
                 }
+                phone_no = ""
+                if office.landload.phone_number:
+                    phone_no = office.landload.phone_number
+                else:
+                    phone_no = "255621189850"
+                message = f"Someone booked your office:  {office.name} login to the system to view"
+                send_sms(phone_no, message)
                 return Response(response, status=status.HTTP_200_OK)
             else:
                 response = {

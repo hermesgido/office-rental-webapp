@@ -1,42 +1,26 @@
-
-import requests
-
-
-def send_sms_api(  message, 
-             recipients, 
-              ):
-    content_type="application/json"
-    schedule_time=None
-    recipient_id=None
-    dest_addr=None
-    encoding=0
-    source_addr = "INFO"
-    api_key = "8d069829168328d7"
-    secret_key = "NjEzY2YwMjdiYjM4YzU3OTY0ZGIxYzcyZmVkNDcyNTcwZTAxOTkxMzI3ZDM2OTNkYjYxMjc1NmVjOTE4MTRkYg=="
-    
+def send_sms(number, message):
+    import requests
+    from requests.auth import HTTPBasicAuth
     url = "https://apisms.beem.africa/v1/send"
-    headers = {
-        "Content-Type": content_type
-    }
-    auth = (api_key, secret_key)
+
     data = {
-        "source_addr": source_addr,
+        "source_addr": "INFO",
+        "encoding": 0,
         "message": message,
-        "recipients": recipients,
-        "encoding": encoding
+        "recipients": [
+            {
+                "recipient_id": 1,
+                "dest_addr": f"{number}"
+            }
+        ]
     }
-    if recipient_id:
-        data["recipient_id"] = recipient_id
-    if dest_addr:
-        data["dest_addr"] = dest_addr
-    if schedule_time:
-        data["schedule_time"] = schedule_time
+    password = "MGVjMjVhOTQ1N2U0MmM2MzQwNjc2YzI3MjdiMzk2YzViZjVhNDcyZGRkODViMDc3MGFlYTkzYzQ1YTAyMjAwZg=="
+    username = "ce64e6750d9de50e"
 
-    response = requests.post(url, headers=headers, auth=auth, json=data)
-    
-    return response.json()
+    response = requests.post(url, json=data, auth=HTTPBasicAuth(username, password))
 
-message = "Hello from Beem Africa!"
-recipients = ["255621189850"] 
-response = send_sms_api(message, recipients)
-print(response)
+    if response.status_code == 200:
+        print("SMS sent successfully!")
+    else:
+        print("SMS sending failed. Status code:", response.status_code)
+        print("Response:", response.text)
