@@ -52,12 +52,14 @@
             </li>
 
           
+            {% if not request.user.is_superuser%}
 
             <li class="sidebar-item">
                 <a class="sidebar-link" href="{% url 'office:profile' %}">
       <i class="align-middle" data-feather="user"></i> <span class="align-middle">Profile</span>
     </a>
             </li>
+{% endif %}
 
             <li class="sidebar-item">
                 <a class="sidebar-link" href="{% url 'office:logout' %}">
