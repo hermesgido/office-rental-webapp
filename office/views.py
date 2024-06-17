@@ -327,3 +327,9 @@ def delete_tenant(request, id):
     messages.success(request, 'Tenant deleted successful')
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
+def delete_booking(request, id):
+    booking = OfficeBooking.objects.get(id=id)
+    booking.delete()
+    messages.success(request, 'Booking deleted successful')
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
